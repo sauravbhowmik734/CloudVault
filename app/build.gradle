@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.chaquo.python'
+}
+
+android {
+    namespace 'com.cloudvault.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.cloudvault.app"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+        ndk { abiFilters "arm64-v8a", "armeabi-v7a", "x86_64" }
+        python {
+            version "3.11"
+            buildPython "python3.11"
+            pip {
+                install "flask"
+                install "telethon"
+                install "waitress"
+                install "Pillow==10.1.0"
+            }
+        }
+    }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv("VAULT_KEYSTORE")
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv("VAULT_KS_PASS")
+                keyAlias System.getenv("VAULT_KEY_ALIAS")
+                keyPassword System.getenv("VAULT_KEY_PASS")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (System.getenv("VAULT_KEYSTORE")) signingConfig signingConfigs.release
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    kotlinOptions { jvmTarget = "17" }
+    packagingOptions { jniLibs { useLegacyPackaging = true } }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+}
