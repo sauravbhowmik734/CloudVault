@@ -17,6 +17,7 @@ jobs:
           cp -r /tmp/x/CloudVault/. ./
           rm -rf .github/workflows/build.yml
           git rm -q CloudVault.zip
+          sed -i 's/Pillow==10.1.0/Pillow/' app/build.gradle
 
       - name: Commit source files
         run: |
@@ -24,6 +25,7 @@ jobs:
           git config user.email "actions@github.com"
           git add -A -- . ':!.github'
           git commit -m "Extract CloudVault source" || true
+          git pull --rebase || true
           git push || true
 
       - uses: actions/setup-java@v4
